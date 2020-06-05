@@ -1,17 +1,45 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React, { Fragment, useState } from "react";
+import ReactDOM from "react-dom";
+import { Camera } from "./camera";
+import { Root, Preview, Footer, GlobalStyle } from "./styles";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+function App() {
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cardImage, setCardImage] = useState();
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  return (
+    <Fragment>
+      <Root>
+        {isCameraOpen && (
+          <Camera
+            onCapture={blob => setCardImage(blob)}
+            onClear={() => setCardImage(undefined)}
+          />
+        )}
+
+        {cardImage && (
+          <div>
+            <h2>Preview</h2>
+            <Preview src={cardImage && URL.createObjectURL(cardImage)} />
+          </div>
+        )}
+
+        <Footer>
+          <button onClick={() => setIsCameraOpen(true)}>Open Camera</button>
+          <button
+            onClick={() => {
+              setIsCameraOpen(false);
+              setCardImage(undefined);
+            }}
+          >
+            Close Camera
+          </button>
+        </Footer>
+      </Root>
+      <GlobalStyle />
+    </Fragment>
+  );
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
